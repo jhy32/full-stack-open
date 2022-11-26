@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseUrl = 'http://localhost:3001/persons'
+const baseUrl = '/api/persons'
 
 
 const create = (newObj) => (
@@ -14,8 +14,13 @@ const replace = (id, newObj) => (
     axios.put(`${baseUrl}/${id}`, newObj)
 )
 
+const get = () => (
+    axios.get(baseUrl)
+)
+
 
 export default {
+    get,
     create,
     del, 
     replace

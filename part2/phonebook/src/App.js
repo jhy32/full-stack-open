@@ -15,8 +15,7 @@ const App = () => {
   const [messageType, setMessageType] = useState("")
   useEffect(() => {
     //set state is async so the log is inaccurate
-    axios
-      .get('http://localhost:3001/persons')
+    noteService.get()
       .then(response => (
         setPersons(response.data)))
   }, []) 
@@ -43,11 +42,17 @@ const App = () => {
     const newObj = {name: newName, number: newNumber}
     noteService.create(newObj).then((r)=> {
       setPersons(persons.concat(r.data))
-    }).then(
-      () => {setMessageType("successful") ;
+      setMessageType("successful")
       setMessage(`Added ${newName}`)}).then(
-        () => setTimeout(()=>setMessage(null), 5000))
+        () => setTimeout(()=>setMessage(null), 5000)).catch(
+          error => {
+            console.log(error.response.data.error)
+            setMessageType("unsuccessful") ;
+            setMessage(`${error.response.data.error}`)}).then(
+            () => setTimeout(()=>setMessage(null), 5000))
     }
+        
+    
     // setPersons(persons.concat([r])))
     setNewName("")
     setNewNumber("")
@@ -88,13 +93,10 @@ const PersonForm = ({setPersonsOnSubmit, setNewName, setNewNumber, name, number}
 const Persons = ({persons, filter, setPersons}) => {
   const removePerson = (person, e) => { 
     e.preventDefault()
-    console.log("removing", person)
-    console.log("persons", persons)
-    console.log(persons.find((personEntry)=> personEntry.name === person.name).id)
-    noteService.del(persons.find((personEntry)=> personEntry.name === person.name).id)
-    //what about local id
+    noteService.del(person.id)
     setPersons(persons.filter((personEntry)=> personEntry.id !== person.id))
   }
+    //what about local id
   return (
   <div>
   {persons.filter((person)=> person.name.toLowerCase().includes(filter.toLowerCase())).map(
